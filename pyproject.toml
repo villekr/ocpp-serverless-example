@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "ocpp-serverless-example"
+version = "0.1.0"
+description = "ocpp event based message handling example"
+authors = []
+
+[tool.poetry.dependencies]
+python = "3.8.1"
+websockets = "8.1"
+ocpp = "0.8.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "5.4.3"
+pytest-asyncio = "0.14.0"
+black = "20.8b1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
