@@ -1,11 +1,9 @@
 from datetime import datetime
 
-from ocpp.v16 import ChargePoint
-from ocpp.v16 import call, call_result
-from ocpp.routing import on, after
-from ocpp.v16.enums import (
-    Action,
-)
+from ocpp.routing import after, on
+from ocpp.v16 import ChargePoint, call, call_result
+from ocpp.v16.enums import Action
+
 
 class ChargingStation(ChargePoint):
     def __init__(self, **kwargs):
@@ -41,10 +39,13 @@ class ChargingStation(ChargePoint):
     async def on_get_configuration(self, **kwargs):
         print("on_get_configuration")
         payload = call.GetConfigurationPayload(**kwargs)
+        print(payload)
         # do something
 
     # Utilities
 
-    async def register_charging_station(self, id: str, payload: call.BootNotificationPayload):
+    async def register_charging_station(
+        self, id: str, payload: call.BootNotificationPayload
+    ):
         print("register_charging_station")
         pass

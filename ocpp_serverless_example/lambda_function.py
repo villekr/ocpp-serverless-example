@@ -1,5 +1,5 @@
-import os
 import asyncio
+import os
 
 import boto3
 
@@ -7,7 +7,7 @@ from ocpp_serverless_example.charging_station import ChargingStation
 from ocpp_serverless_example.connection_aws import AWSLambdaConnection
 
 endpoint_url = os.getenv("APIGATEWAY_WEBSOCKET_ENDPOINT_URL")
-apigateway_client = boto3.client('apigatewaymanagementapi', endpoint_url=endpoint_url)
+apigateway_client = boto3.client("apigatewaymanagementapi", endpoint_url=endpoint_url)
 
 # Problem: Charging Station identity, action handlers and connection are all bundled.
 # Ideally we would build route map (create_route_map) only once and share that for
@@ -27,11 +27,10 @@ async def async_lambda_hander(event, context):
     # but has to be part of the solution i.e. based on environment different adaptation
     # is needed in order to operate in event based fashion.
     connection = AWSLambdaConnection(
-        apigateway_client=apigateway_client,
-        connection_id=connection_id
+        apigateway_client=apigateway_client, connection_id=connection_id
     )
     # Problem: identity (id) should be passed somehow to route_message so that action
-    # handlers will have id available to map message handling with correct charging 
+    # handlers will have id available to map message handling with correct charging
     # station identity.
     # (AWS Websockets API connection_id doesn't represent "id" but for here this can do)
     charging_station.id = connection_id

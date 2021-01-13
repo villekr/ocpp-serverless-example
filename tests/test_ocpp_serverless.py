@@ -4,14 +4,9 @@ from uuid import uuid4
 
 import pytest
 import websockets
-from ocpp.v16 import call, call_result
+from ocpp.charge_point import remove_nones, snake_to_camel_case
 from ocpp.messages import Call, CallResult
-
-from ocpp.charge_point import (
-    remove_nones,
-    snake_to_camel_case,
-)
-
+from ocpp.v16 import call, call_result
 
 WEBSOCKET_URL = os.getenv("WEBSOCKET_URL")
 
@@ -55,7 +50,7 @@ async def test_send_receive():
             ocppj_message = payload_to_ocppj_message(
                 get_configuration_payload, class_type=CallResult
             )
-            
+
             await websocket.send(ocppj_message)  # -> CallResult/GetConfiguration
             response = await websocket.recv()  # <- None
             print(response)
