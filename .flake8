@@ -1,5 +1,6 @@
 [flake8]
 max-line-length = 88
-max-complexity = 10
+max-complexity = 12
 import-order-style = google
 docstring-convention = google
+per-file-ignores = tests/*:S101

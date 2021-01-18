@@ -1,13 +1,26 @@
 from datetime import datetime
 
 from ocpp.routing import after, on
-from ocpp.v16 import ChargePoint, call, call_result
+from ocpp.v16 import call, call_result  # , ChargePoint not used but overriden version
 from ocpp.v16.enums import Action
+
+from ocpp_serverless_example.charge_point import ChargePoint  # import overriden version
+from ocpp_serverless_example.models import (
+    Context,
+    Queue,
+    Connection,
+    ResponseStrategy,
+    AfterHookStrategy,
+)
 
 
 class ChargingStation(ChargePoint):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, id, context: Context):
+        super().__init__(id=id, connection=context.connection)
+        self._response_queue: Queue = context.queue
+        self._connection: Connection = context.connection
+        self._response_strategy: ResponseStrategy = context.response_strategy
+        self._after_hook_strategy: AfterHookStrategy = context.after_hook_strategy
 
     # Action handlers
 
@@ -15,7 +28,7 @@ class ChargingStation(ChargePoint):
     async def on_boot_notification(self, **kwargs):
         print("on_boot_notification")
         payload = call.BootNotificationPayload(**kwargs)
-        await self.register_charging_station(self.id, payload)
+        await self.register_charging_station(self.id, payload)  # make internal call
         return call_result.BootNotificationPayload(
             current_time=datetime.utcnow().isoformat(),
             interval=10,
@@ -26,21 +39,8 @@ class ChargingStation(ChargePoint):
     async def after_boot_notification(self, **kwargs):
         print("after_boot_notification")
         payload = call.GetConfigurationPayload()
-        # Problem: CallResult/CallError will invoke another Lambda i.e. we never
-        # get response here.
-        # One possible solution:
-        # - CallResult/CallError messages are put to some queue (e.g. SQS/Redis)
-        # - AWSConnection.call polls that queue for specific message and return it as
-        # response here. Basically SQS/Redis would be used instead of asyncio.Queue()
         response = await self.call(payload)
         print(response)
-
-    @on(Action.GetConfiguration)
-    async def on_get_configuration(self, **kwargs):
-        print("on_get_configuration")
-        payload = call.GetConfigurationPayload(**kwargs)
-        print(payload)
-        # do something
 
     # Utilities
 
